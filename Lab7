@@ -1,0 +1,101 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Product {
+private:
+    string name;
+    double price;
+public:
+    Product(string name, double price) : name(name), price(price) {}
+
+    string getName() const { return name; }
+    double getPrice() const { return price; }
+};
+
+class Order {
+private:
+    Product product;
+    int quantity;
+public:
+    Order(Product product, int quantity) : product(product), quantity(quantity) {}
+
+    double getTotalPrice() const { return product.getPrice() * quantity; }
+};
+
+class Sales {
+private:
+    vector<string> blackList;
+
+public:
+    void addToBlackList(string customer) {
+        blackList.push_back(customer);
+        cout << "Замовник " << customer << " додано до чорного списку." << endl;
+    }
+
+    bool checkBlackList(string customer) {
+        for (string name : blackList) {
+            if (name == customer) {
+                cout << "Замовник " << customer << " знаходиться в чорному списку." << endl;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void registerSale(string customer, double totalPrice) {
+        if (!checkBlackList(customer)) {
+            cout << "Продаж зареєстрований на клієнта " << customer << " загальною ціною: $" << totalPrice << endl;
+        }
+    }
+};
+
+int main() {
+    Sales sales;
+    vector<Product> products = {
+        Product("Laptop", 1000.0),
+        Product("Smartphone", 500.0),
+        Product("Headphones", 100.0)
+    };
+
+    cout << "Доступні продукти:" << endl;
+    for (const Product &product : products) {
+        cout << product.getName() << " - $" << product.getPrice() << endl;
+    }
+
+    string productName;
+    cout << "Введіть назву товару для замовлення: ";
+    getline(cin, productName);
+
+    Product selectedProduct("", 0.0);
+    for (const Product &product : products) {
+        if (product.getName() == productName) {
+            selectedProduct = product;
+            break;
+        }
+    }
+
+    if (selectedProduct.getName() == "") {
+        cout << "Product not found!" << endl;
+        return 0;
+    }
+
+    int quantity;
+    cout << "Введіть кількість: ";
+    cin >> quantity;
+
+    Order order(selectedProduct, quantity);
+    double totalPrice = order.getTotalPrice();
+    cout << "Загальна сума: $" << totalPrice << endl;
+
+    string customer;
+    cout << "Введіть ім'я клієнта: ";
+    cin.ignore();
+    getline(cin, customer);
+
+    sales.registerSale(customer, totalPrice);
+
+    return 0;
+}
